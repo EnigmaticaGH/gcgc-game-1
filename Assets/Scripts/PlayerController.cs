@@ -102,9 +102,13 @@ public class PlayerController : MonoBehaviour
 
     private bool IsGrounded()
     {
-        RaycastHit2D hit = Physics2D.Raycast(playerCollider.bounds.center, Vector2.down, heightTestPlayer, layerMaskGround);
-        bool isGrounded = hit.collider != null;
-        Debug.DrawRay(playerCollider.bounds.center, Vector2.down * heightTestPlayer, isGrounded ? Color.green : Color.red, 0.5f);
+        var ray1Origin = playerCollider.bounds.center - new Vector3(playerCollider.bounds.extents.x, 0, 0);
+        var ray2Origin = playerCollider.bounds.center + new Vector3(playerCollider.bounds.extents.x, 0, 0);
+        RaycastHit2D hit1 = Physics2D.Raycast(ray1Origin, Vector2.down, heightTestPlayer, layerMaskGround);
+        RaycastHit2D hit2 = Physics2D.Raycast(ray2Origin, Vector2.down, heightTestPlayer, layerMaskGround);
+        bool isGrounded = hit1.collider != null || hit2.collider != null;
+        Debug.DrawRay(ray1Origin, Vector2.down * heightTestPlayer, isGrounded ? Color.green : Color.red, Time.deltaTime * 2);
+        Debug.DrawRay(ray2Origin, Vector2.down * heightTestPlayer, isGrounded ? Color.green : Color.red, Time.deltaTime * 2);
         return isGrounded;
     }
 
