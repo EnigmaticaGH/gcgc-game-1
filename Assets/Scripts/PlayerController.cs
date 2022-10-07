@@ -13,7 +13,6 @@ public class PlayerController : MonoBehaviour
     private int layerMaskGround;
     private float heightTestPlayer;
     private Vector3 startingPosition;
-    private Quaternion startingRotation;
 
     public float moveSpeed = 1;
     public float jumpForce = 1;
@@ -38,53 +37,68 @@ public class PlayerController : MonoBehaviour
         };
 
         startingPosition = transform.position;
-        startingRotation = transform.rotation;
     }
 
     void Update()
     {
-        if ((checkInput("left") || checkInput("right")) && IsGrounded())
+        // Animation control
+        // Do the walking animation if the player is moving and on the ground
+        if (rigidbody.velocity.x != 0 && IsGrounded())
         {
             animator.Play("Walk", 0);
         }
+        // Do idle animation if player isn't moving and on the ground
+        if (rigidbody.velocity.x == 0 && IsGrounded())
+        {
+            animator.Play("Idle", 0);
+        }
+        // Do jump animation if player is off the ground
         if (!IsGrounded())
         {
             animator.Play("Jump", 0);
-        }
-        if (IsGrounded() && !checkInput("left") && !checkInput("right"))
-        {
-            animator.Play("Idle", 0);
         }
     }
 
     void FixedUpdate()
     {
-        if (checkInput("left"))
-        {
-            Vector3 movement = new Vector3(-1, 0, 0);
-            transform.Translate(movement * moveSpeed * Time.deltaTime);
-            renderer.flipX = true;
-        }
+        // Remember the speed and direction of the player in the previous frame
+        Vector3 velocityVector = rigidbody.velocity;
+
+        // This will allow both left/right keys to be pressed and intuitively cancel each other out
+        float horizontalMoveSpeed = 0;
+
         if (checkInput("right"))
         {
-            Vector3 movement = new Vector3(1, 0, 0);
-            transform.Translate(movement * moveSpeed * Time.deltaTime);
-            renderer.flipX = false;
+            horizontalMoveSpeed += moveSpeed;
         }
+        if (checkInput("left"))
+        {
+            horizontalMoveSpeed -= moveSpeed;
+        }
+
+        // Add jump force when player is on the ground
         if (checkInput("jump") && IsGrounded())
         {
-            Vector3 movement = new Vector3(0, 1 * jumpForce, 0);
-            rigidbody.velocity = movement;
+            velocityVector += new Vector3(0, jumpForce, 0);
         }
+
+        // Modify player speed and direction after input checks
+        rigidbody.velocity = new Vector3(horizontalMoveSpeed, velocityVector.y, 0);
+
+        // Flip the sprite if the player changes direction, but don't change direction just because the player stops moving
+        if (horizontalMoveSpeed != 0)
+        {
+            renderer.flipX = horizontalMoveSpeed < 0;
+        }
+
         if (checkInput("reset"))
         {
             transform.position = startingPosition;
-            transform.rotation = startingRotation;
-            rigidbody.angularVelocity = 0;
             rigidbody.velocity = new Vector3(0, 0, 0);
         }
     }
 
+    // Cast 2 rays on the sides of the player facing downward. If these rays collide with a solid ground object, the player is considered to be grounded
     private bool IsGrounded()
     {
         var ray1Origin = playerCollider.bounds.center - new Vector3(playerCollider.bounds.extents.x, 0, 0);
@@ -97,6 +111,7 @@ public class PlayerController : MonoBehaviour
         return isGrounded;
     }
 
+    // Function to check if any valid input for a given action is pressed. Supports multiple input bindings
     private bool checkInput(string type)
     {
         if (inputKeys.TryGetValue(type, out var keys))
