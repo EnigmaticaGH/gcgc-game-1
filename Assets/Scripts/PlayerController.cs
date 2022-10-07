@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ public class PlayerController : MonoBehaviour
 
     private int layerMaskGround;
     private float heightTestPlayer;
+    private float floatingPointErrorTolerance;
+
     private Vector3 startingPosition;
 
     public float moveSpeed = 1;
@@ -28,6 +31,9 @@ public class PlayerController : MonoBehaviour
         heightTestPlayer = playerCollider.bounds.extents.y + 0.05f;
         layerMaskGround = LayerMask.GetMask("Ground");
 
+        // Floating point (decimal) numbers aren't super precise so we add an acceptable error tolerance to our checks
+        floatingPointErrorTolerance = 0.01f;
+
         inputKeys = new Dictionary<string, KeyCode[]>()
         {
             {"left", new KeyCode[] {KeyCode.A} },
@@ -43,12 +49,12 @@ public class PlayerController : MonoBehaviour
     {
         // Animation control
         // Do the walking animation if the player is moving and on the ground
-        if (rigidbody.velocity.x != 0 && IsGrounded())
+        if (Math.Abs(rigidbody.velocity.x) > floatingPointErrorTolerance && IsGrounded())
         {
             animator.Play("Walk", 0);
         }
         // Do idle animation if player isn't moving and on the ground
-        if (rigidbody.velocity.x == 0 && IsGrounded())
+        if (Math.Abs(rigidbody.velocity.x) <= floatingPointErrorTolerance && IsGrounded())
         {
             animator.Play("Idle", 0);
         }
