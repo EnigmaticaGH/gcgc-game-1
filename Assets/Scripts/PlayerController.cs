@@ -19,7 +19,6 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 1;
     public Dictionary<string, KeyCode[]> inputKeys = new Dictionary<string, KeyCode[]>();
 
-    // Start is called before the first frame update
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -42,7 +41,6 @@ public class PlayerController : MonoBehaviour
         startingRotation = transform.rotation;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if ((checkInput("left") || checkInput("right")) && IsGrounded())
