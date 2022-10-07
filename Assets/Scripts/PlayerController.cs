@@ -87,7 +87,9 @@ public class PlayerController : MonoBehaviour
         // Add jump force when player is on the ground
         if (checkInput("jump") && IsGrounded())
         {
-            velocityVector += new Vector3(0, jumpForce, 0);
+            var currentVerticalSpeed = velocityVector.y;
+            var targetVerticalSpeed = jumpForce - currentVerticalSpeed;
+            velocityVector += new Vector3(0, targetVerticalSpeed, 0);
         }
 
         // Modify player speed and direction after input checks
