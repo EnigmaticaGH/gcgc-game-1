@@ -45,15 +45,15 @@ public class PlayerController : MonoBehaviour
     {
         if ((checkInput("left") || checkInput("right")) && IsGrounded())
         {
-            PlayWalkAnimation();
+            animator.Play("Walk", 0);
         }
         if (!IsGrounded())
         {
-            PlayJumpAnimation();
+            animator.Play("Jump", 0);
         }
         if (IsGrounded() && !checkInput("left") && !checkInput("right"))
         {
-            PlayIdleAnimation();
+            animator.Play("Idle", 0);
         }
     }
 
@@ -83,21 +83,6 @@ public class PlayerController : MonoBehaviour
             rigidbody.angularVelocity = 0;
             rigidbody.velocity = new Vector3(0, 0, 0);
         }
-    }
-
-    private void PlayIdleAnimation()
-    {
-        animator.Play("Idle", 0);
-    }
-
-    private void PlayWalkAnimation()
-    {
-        animator.Play("Walk", 0);
-    }
-
-    private void PlayJumpAnimation()
-    {
-        animator.Play("Jump", 0);
     }
 
     private bool IsGrounded()
