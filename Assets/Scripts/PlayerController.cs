@@ -45,6 +45,7 @@ public class PlayerController : MonoBehaviour
         startingPosition = transform.position;
     }
 
+    // Runs once per graphical frame. Great for animation behavior, but steady FPS is not guaranteed so not good for physics
     void Update()
     {
         // Animation control
@@ -65,6 +66,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Always runs at a consistent FPS as long as it isn't slowed down by too much computation. Good for physics calculations
     void FixedUpdate()
     {
         // Remember the speed and direction of the player in the previous frame
